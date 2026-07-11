@@ -1,1 +1,3 @@
-# Django configuration package
+"""
+Django configuration package
+"""
