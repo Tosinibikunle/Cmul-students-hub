@@ -1,34 +1,88 @@
-function Dashboard() {
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import '../styles/Dashboard.css';
+
+const Dashboard = () => {
+  const { user } = useAuth();
+  const [student, setStudent] = useState(null);
+  const [enrollments, setEnrollments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('access_token');
+        
+        const studentRes = await axios.get('http://localhost:8000/api/students/me/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setStudent(studentRes.data);
+
+        const enrollmentsRes = await axios.get('http://localhost:8000/api/enrollments/my_enrollments/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEnrollments(enrollmentsRes.data);
+        
+        setError(null);
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to load dashboard data');
+        console.error('Dashboard error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  if (loading) return <div className="dashboard-loading">Loading dashboard...</div>;
+  if (error) return <div className="dashboard-error">Error: {error}</div>;
+
   return (
-    <div className="space-y-8">
-      <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Total Students</h2>
-          <p className="text-4xl font-bold text-blue-600">--</p>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Total Courses</h2>
-          <p className="text-4xl font-bold text-green-600">--</p>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Active Enrollments</h2>
-          <p className="text-4xl font-bold text-purple-600">--</p>
-        </div>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Welcome, {student?.user?.first_name}!</h1>
+        <p>Student ID: {student?.student_id}</p>
       </div>
-      
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Welcome</h2>
-        <p className="text-gray-700">
-          Welcome to CMUL Students Hub. This application helps manage student information,
-          courses, and enrollments. Get started by exploring the Students and Courses sections.
-        </p>
+
+      <div className="dashboard-grid">
+        <section className="dashboard-card">
+          <h2>Profile Information</h2>
+          {student && (
+            <div className="profile-info">
+              <p><strong>Email:</strong> {student.user.email}</p>
+              <p><strong>Phone:</strong> {student.phone || 'Not provided'}</p>
+              <p><strong>Date of Birth:</strong> {student.date_of_birth || 'Not provided'}</p>
+              <p><strong>Address:</strong> {student.address || 'Not provided'}</p>
+            </div>
+          )}
+        </section>
+
+        <section className="dashboard-card">
+          <h2>Current Enrollments</h2>
+          {enrollments.length > 0 ? (
+            <div className="enrollments-list">
+              {enrollments.map(enrollment => (
+                <div key={enrollment.id} className="enrollment-item">
+                  <h3>{enrollment.course.code}</h3>
+                  <p>{enrollment.course.title}</p>
+                  <p className="status">Status: {enrollment.status}</p>
+                  {enrollment.grade && <p className="grade">Grade: {enrollment.grade}</p>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No active enrollments</p>
+          )}
+        </section>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
