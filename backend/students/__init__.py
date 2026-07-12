@@ -1,1 +1,3 @@
-# Students app
+"""
+Students app
+"""
