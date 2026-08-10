@@ -4,12 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/Navbar.css';
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -17,38 +17,67 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <span className="logo-icon">🎓</span>
+          <span className="logo-icon">📚</span>
           Students Hub
         </Link>
-        
-        <button 
-          className="menu-toggle"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          ☰
-        </button>
 
-        <div className={`navbar-menu ${menuOpen ? 'active' : ''}`}>
-          {user ? (
+        <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
+          <i className={menuOpen ? 'fas fa-times' : 'fas fa-bars'}></i>
+        </div>
+
+        <ul className={menuOpen ? 'nav-menu active' : 'nav-menu'}>
+          {isAuthenticated ? (
             <>
-              <Link to="/dashboard" className="nav-link">Dashboard</Link>
-              <Link to="/courses" className="nav-link">Courses</Link>
-              <Link to="/enrollment" className="nav-link">Enrollment</Link>
-              <Link to="/profile" className="nav-link">Profile</Link>
-              <div className="nav-user">
-                <span className="user-greeting">Hi, {user.username}</span>
-                <button onClick={handleLogout} className="logout-btn">
+              <li className="nav-item">
+                <Link to="/dashboard" className="nav-links" onClick={() => setMenuOpen(false)}>
+                  Dashboard
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/courses" className="nav-links" onClick={() => setMenuOpen(false)}>
+                  Courses
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/enrollment" className="nav-links" onClick={() => setMenuOpen(false)}>
+                  Enrollment
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/profile" className="nav-links" onClick={() => setMenuOpen(false)}>
+                  Profile
+                </Link>
+              </li>
+              <li className="nav-item">
+                <span className="nav-user">Welcome, {user?.username}!</span>
+              </li>
+              <li className="nav-item">
+                <button className="nav-links-mobile" onClick={handleLogout}>
                   Logout
                 </button>
-              </div>
+              </li>
             </>
           ) : (
             <>
-              <Link to="/login" className="nav-link">Login</Link>
-              <Link to="/register" className="nav-link register-link">Register</Link>
+              <li className="nav-item">
+                <Link to="/login" className="nav-links" onClick={() => setMenuOpen(false)}>
+                  Login
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/register" className="nav-links-btn" onClick={() => setMenuOpen(false)}>
+                  Register
+                </Link>
+              </li>
             </>
           )}
-        </div>
+        </ul>
+
+        {isAuthenticated && (
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );
