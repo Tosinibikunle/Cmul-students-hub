@@ -1,151 +1,159 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import '../styles/Register.css';
+import '../styles/Auth.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    password: '',
+    password2: '',
     first_name: '',
     last_name: '',
-    password: '',
-    password2: ''
   });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setError('');
+
     if (formData.password !== formData.password2) {
       setError('Passwords do not match');
       return;
     }
 
+    setLoading(true);
+
     try {
-      setLoading(true);
-      setError(null);
       await register(formData);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <h1>Create Account</h1>
-        <p className="register-subtitle">Join the Students Hub</p>
-        
-        {error && <div className="register-error">{error}</div>}
-        
-        <form onSubmit={handleSubmit} className="register-form">
+    <div className="auth-container">
+      <div className="auth-box">
+        <div className="auth-header">
+          <h1>Create Account 🎓</h1>
+          <p>Join our students community</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          {error && <div className="auth-error">{error}</div>}
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="first_name">First Name</label>
               <input
-                id="first_name"
                 type="text"
+                id="first_name"
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
                 placeholder="First name"
                 required
+                disabled={loading}
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="last_name">Last Name</label>
               <input
-                id="last_name"
                 type="text"
+                id="last_name"
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
                 placeholder="Last name"
                 required
+                disabled={loading}
               />
             </div>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
-              id="username"
               type="text"
+              id="username"
               name="username"
               value={formData.username}
               onChange={handleChange}
               placeholder="Choose a username"
               required
+              disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
-              id="email"
               type="email"
+              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="your@email.com"
+              placeholder="Enter your email"
               required
+              disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
-              id="password"
               type="password"
+              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter password"
+              placeholder="Create a password"
               required
+              disabled={loading}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password2">Confirm Password</label>
             <input
-              id="password2"
               type="password"
+              id="password2"
               name="password2"
               value={formData.password2}
               onChange={handleChange}
-              placeholder="Confirm password"
+              placeholder="Confirm your password"
               required
+              disabled={loading}
             />
           </div>
-          
-          <button 
-            type="submit" 
-            className="register-btn"
-            disabled={loading}
-          >
-            {loading ? 'Creating Account...' : 'Create Account'}
+
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
-        
-        <p className="register-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
+
+        <div className="auth-footer">
+          <p>
+            Already have an account?{' '}
+            <Link to="/login" className="auth-link">
+              Sign in here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
