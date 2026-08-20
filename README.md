@@ -63,7 +63,3 @@ npm run dev
 
 - Swagger UI: http://localhost:8000/api/docs/
 - ReDoc: http://localhost:8000/api/redoc/
-
-## Contributing
-
-See CONTRIBUTING.md for guidelines.
