@@ -60,7 +60,7 @@ npm run dev
 
 ## API Documentation
 
-DRF provides automatic API documentation at:
+
 - Swagger UI: http://localhost:8000/api/docs/
 - ReDoc: http://localhost:8000/api/redoc/
 
