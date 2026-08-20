@@ -45,7 +45,7 @@ const Courses = () => {
     <div className="courses-container">
       <div className="courses-header">
         <h1>Available Courses</h1>
-        <p>Choose courses that match your academic goals</p>
+        <p>Choose courses</p>
       </div>
 
       {error && <div className="courses-error">{error}</div>}
